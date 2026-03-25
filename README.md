@@ -6,7 +6,7 @@
 
 **A specification language for describing applications in the fewest possible tokens.**
 
-Kappa captures data models, constraints, relationships, authorization, and workflows in a notation so compact that an entire entity fits on one line — and so precise that a parser can generate a full application from it. Write the spec once. Generate schemas, types, validators, APIs, UI, and tests from it. Nothing is repeated. Nothing drifts.
+<sub><i>Kappa captures data models, constraints, relationships, authorization, and workflows in a notation so compact that an entire entity fits on one line — and so precise that a parser can generate a full application from it. Write the spec once. Generate schemas, types, validators, APIs, UI, and tests from it. Nothing is repeated. Nothing drifts.</i></sub>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Spec: Stable](https://img.shields.io/badge/Spec-Stable-green.svg)](spec/language.md)
