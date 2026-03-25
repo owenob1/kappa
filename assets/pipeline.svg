@@ -1,91 +1,101 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="800" height="420">
   <defs>
-    <linearGradient id="purple" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#6366f1"/>
-      <stop offset="100%" style="stop-color:#8b5cf6"/>
+    <linearGradient id="brand" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4f46e5"/>
+      <stop offset="100%" style="stop-color:#7c3aed"/>
     </linearGradient>
-    <linearGradient id="blue" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="mid" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#3b82f6"/>
-      <stop offset="100%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#4f46e5"/>
     </linearGradient>
-    <linearGradient id="green" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#10b981"/>
-      <stop offset="100%" style="stop-color:#34d399"/>
+    <linearGradient id="gen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#059669"/>
+      <stop offset="100%" style="stop-color:#10b981"/>
     </linearGradient>
-    <filter id="shadow">
-      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.1"/>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
     </filter>
   </defs>
 
   <!-- Background -->
-  <rect width="800" height="400" fill="#0f172a" rx="16"/>
+  <rect width="800" height="420" fill="#0b0b0d" rx="12"/>
 
-  <!-- .kappa file box -->
-  <rect x="310" y="20" width="180" height="50" rx="10" fill="url(#purple)" filter="url(#shadow)"/>
-  <text x="400" y="52" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" font-weight="600" fill="white">.kappa file</text>
+  <!-- Subtle grid lines -->
+  <line x1="0" y1="105" x2="800" y2="105" stroke="#1d1d20" stroke-width="0.5"/>
+  <line x1="0" y1="195" x2="800" y2="195" stroke="#1d1d20" stroke-width="0.5"/>
+  <line x1="0" y1="285" x2="800" y2="285" stroke="#1d1d20" stroke-width="0.5"/>
 
-  <!-- Arrow down to parser -->
-  <line x1="400" y1="70" x2="400" y2="100" stroke="#8b5cf6" stroke-width="2"/>
-  <polygon points="393,96 400,106 407,96" fill="#8b5cf6"/>
+  <!-- .kappa file -->
+  <rect x="310" y="24" width="180" height="52" rx="8" fill="url(#brand)" filter="url(#glow)"/>
+  <text x="400" y="48" text-anchor="middle" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" font-size="11" font-weight="500" fill="#c4b5fd" letter-spacing="1.5" text-transform="uppercase">SOURCE</text>
+  <text x="400" y="66" text-anchor="middle" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" font-size="16" font-weight="600" fill="#ffffff">.kappa file</text>
 
-  <!-- Parser box -->
-  <rect x="310" y="106" width="180" height="50" rx="10" fill="url(#blue)" filter="url(#shadow)"/>
-  <text x="400" y="130" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" font-weight="600" fill="white">Parser</text>
-  <text x="400" y="147" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#c7d2fe">Deterministic</text>
+  <!-- Arrow 1 -->
+  <line x1="400" y1="76" x2="400" y2="108" stroke="#7c3aed" stroke-width="2" opacity="0.7"/>
+  <polygon points="394,104 400,114 406,104" fill="#7c3aed" opacity="0.7"/>
 
-  <!-- Arrow down to AST -->
-  <line x1="400" y1="156" x2="400" y2="186" stroke="#6366f1" stroke-width="2"/>
-  <polygon points="393,182 400,192 407,182" fill="#6366f1"/>
+  <!-- Parser -->
+  <rect x="310" y="114" width="180" height="52" rx="8" fill="url(#mid)" filter="url(#glow)"/>
+  <text x="400" y="138" text-anchor="middle" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" font-size="11" font-weight="500" fill="#93c5fd" letter-spacing="1.5">DETERMINISTIC</text>
+  <text x="400" y="156" text-anchor="middle" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" font-size="16" font-weight="600" fill="#ffffff">Parser</text>
 
-  <!-- AST box -->
-  <rect x="310" y="192" width="180" height="50" rx="10" fill="url(#purple)" filter="url(#shadow)"/>
-  <text x="400" y="216" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" font-weight="600" fill="white">AST</text>
-  <text x="400" y="233" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#c7d2fe">Portable</text>
+  <!-- Arrow 2 -->
+  <line x1="400" y1="166" x2="400" y2="198" stroke="#4f46e5" stroke-width="2" opacity="0.7"/>
+  <polygon points="394,194 400,204 406,194" fill="#4f46e5" opacity="0.7"/>
 
-  <!-- Fan-out arrows -->
-  <line x1="340" y1="242" x2="100" y2="290" stroke="#10b981" stroke-width="2"/>
-  <line x1="370" y1="242" x2="260" y2="290" stroke="#10b981" stroke-width="2"/>
-  <line x1="400" y1="242" x2="400" y2="290" stroke="#10b981" stroke-width="2"/>
-  <line x1="430" y1="242" x2="540" y2="290" stroke="#10b981" stroke-width="2"/>
-  <line x1="460" y1="242" x2="700" y2="290" stroke="#10b981" stroke-width="2"/>
+  <!-- AST -->
+  <rect x="310" y="204" width="180" height="52" rx="8" fill="url(#brand)" filter="url(#glow)"/>
+  <text x="400" y="228" text-anchor="middle" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" font-size="11" font-weight="500" fill="#c4b5fd" letter-spacing="1.5">PORTABLE</text>
+  <text x="400" y="246" text-anchor="middle" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" font-size="16" font-weight="600" fill="#ffffff">AST</text>
+
+  <!-- Fan-out lines -->
+  <line x1="340" y1="256" x2="100" y2="304" stroke="#10b981" stroke-width="1.5" opacity="0.5"/>
+  <line x1="365" y1="256" x2="250" y2="304" stroke="#10b981" stroke-width="1.5" opacity="0.5"/>
+  <line x1="400" y1="256" x2="400" y2="304" stroke="#10b981" stroke-width="1.5" opacity="0.5"/>
+  <line x1="435" y1="256" x2="550" y2="304" stroke="#10b981" stroke-width="1.5" opacity="0.5"/>
+  <line x1="460" y1="256" x2="700" y2="304" stroke="#10b981" stroke-width="1.5" opacity="0.5"/>
 
   <!-- Arrow tips -->
-  <polygon points="94,286 100,296 106,286" fill="#10b981"/>
-  <polygon points="254,286 260,296 266,286" fill="#10b981"/>
-  <polygon points="394,286 400,296 406,286" fill="#10b981"/>
-  <polygon points="534,286 540,296 546,286" fill="#10b981"/>
-  <polygon points="694,286 700,296 706,286" fill="#10b981"/>
+  <polygon points="94,300 100,310 106,300" fill="#10b981" opacity="0.5"/>
+  <polygon points="244,300 250,310 256,300" fill="#10b981" opacity="0.5"/>
+  <polygon points="394,300 400,310 406,300" fill="#10b981" opacity="0.5"/>
+  <polygon points="544,300 550,310 556,300" fill="#10b981" opacity="0.5"/>
+  <polygon points="694,300 700,310 706,300" fill="#10b981" opacity="0.5"/>
 
   <!-- Generator boxes -->
-  <rect x="30" y="296" width="140" height="50" rx="10" fill="url(#green)" filter="url(#shadow)"/>
-  <text x="100" y="318" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="white">Schema</text>
-  <text x="100" y="335" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#d1fae5">Drizzle / SQL</text>
+  <rect x="30" y="310" width="140" height="52" rx="8" fill="url(#gen)"/>
+  <text x="100" y="332" text-anchor="middle" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="600" fill="#ffffff">Schema</text>
+  <text x="100" y="350" text-anchor="middle" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" font-size="11" fill="#d1fae5" opacity="0.8">Drizzle / SQL</text>
 
-  <rect x="190" y="296" width="140" height="50" rx="10" fill="url(#green)" filter="url(#shadow)"/>
-  <text x="260" y="318" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="white">Types</text>
-  <text x="260" y="335" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#d1fae5">TypeScript / Zod</text>
+  <rect x="185" y="310" width="130" height="52" rx="8" fill="url(#gen)"/>
+  <text x="250" y="332" text-anchor="middle" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="600" fill="#ffffff">Types</text>
+  <text x="250" y="350" text-anchor="middle" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" font-size="11" fill="#d1fae5" opacity="0.8">TS / Zod</text>
 
-  <rect x="340" y="296" width="120" height="50" rx="10" fill="url(#green)" filter="url(#shadow)"/>
-  <text x="400" y="318" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="white">API</text>
-  <text x="400" y="335" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#d1fae5">Routes + Auth</text>
+  <rect x="335" y="310" width="130" height="52" rx="8" fill="url(#gen)"/>
+  <text x="400" y="332" text-anchor="middle" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="600" fill="#ffffff">API</text>
+  <text x="400" y="350" text-anchor="middle" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" font-size="11" fill="#d1fae5" opacity="0.8">Routes + Auth</text>
 
-  <rect x="480" y="296" width="120" height="50" rx="10" fill="url(#green)" filter="url(#shadow)"/>
-  <text x="540" y="318" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="white">UI</text>
-  <text x="540" y="335" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#d1fae5">Forms + Tables</text>
+  <rect x="485" y="310" width="130" height="52" rx="8" fill="url(#gen)"/>
+  <text x="550" y="332" text-anchor="middle" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="600" fill="#ffffff">UI</text>
+  <text x="550" y="350" text-anchor="middle" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" font-size="11" fill="#d1fae5" opacity="0.8">Forms + Tables</text>
 
-  <rect x="630" y="296" width="140" height="50" rx="10" fill="url(#green)" filter="url(#shadow)"/>
-  <text x="700" y="318" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="white">Tests</text>
-  <text x="700" y="335" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#d1fae5">Unit + Integration</text>
+  <rect x="630" y="310" width="140" height="52" rx="8" fill="url(#gen)"/>
+  <text x="700" y="332" text-anchor="middle" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="600" fill="#ffffff">Tests</text>
+  <text x="700" y="350" text-anchor="middle" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" font-size="11" fill="#d1fae5" opacity="0.8">Unit + E2E</text>
 
-  <!-- Bottom label -->
-  <text x="400" y="385" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#94a3b8">One parser. Many generators. Zero AI in the pipeline.</text>
+  <!-- Bottom tagline -->
+  <text x="400" y="400" text-anchor="middle" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" font-size="13" fill="#5b5b5b" letter-spacing="0.5">One parser  ·  Many generators  ·  Zero AI in the pipeline</text>
 
-  <!-- Input adapters (left side) -->
-  <rect x="20" y="106" width="130" height="50" rx="10" fill="none" stroke="#475569" stroke-width="1.5" stroke-dasharray="4,3"/>
-  <text x="85" y="128" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#94a3b8">Input Adapters</text>
-  <text x="85" y="145" text-anchor="middle" font-family="system-ui, sans-serif" font-size="10" fill="#64748b">OpenAPI / SQL / GQL</text>
+  <!-- Input adapters (dashed, subtle) -->
+  <rect x="20" y="118" width="140" height="44" rx="6" fill="none" stroke="#27272a" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="90" y="138" text-anchor="middle" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" font-size="11" fill="#5b5b5b">Input Adapters</text>
+  <text x="90" y="153" text-anchor="middle" font-family="-apple-system, 'Segoe UI', system-ui, sans-serif" font-size="10" fill="#34343b">OpenAPI · SQL · GQL</text>
 
-  <!-- Arrow from adapters to parser -->
-  <line x1="150" y1="131" x2="310" y2="131" stroke="#475569" stroke-width="1.5" stroke-dasharray="4,3"/>
-  <polygon points="306,127 314,131 306,135" fill="#475569"/>
+  <!-- Arrow from adapters -->
+  <line x1="160" y1="140" x2="310" y2="140" stroke="#27272a" stroke-width="1" stroke-dasharray="4,3"/>
+  <polygon points="306,136 314,140 306,144" fill="#27272a"/>
 </svg>
