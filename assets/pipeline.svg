@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400">
+  <defs>
+    <linearGradient id="purple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6"/>
+      <stop offset="100%" style="stop-color:#6366f1"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981"/>
+      <stop offset="100%" style="stop-color:#34d399"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="400" fill="#0f172a" rx="16"/>
+
+  <!-- .kappa file box -->
+  <rect x="310" y="20" width="180" height="50" rx="10" fill="url(#purple)" filter="url(#shadow)"/>
+  <text x="400" y="52" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" font-weight="600" fill="white">.kappa file</text>
+
+  <!-- Arrow down to parser -->
+  <line x1="400" y1="70" x2="400" y2="100" stroke="#8b5cf6" stroke-width="2"/>
+  <polygon points="393,96 400,106 407,96" fill="#8b5cf6"/>
+
+  <!-- Parser box -->
+  <rect x="310" y="106" width="180" height="50" rx="10" fill="url(#blue)" filter="url(#shadow)"/>
+  <text x="400" y="130" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" font-weight="600" fill="white">Parser</text>
+  <text x="400" y="147" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#c7d2fe">Deterministic</text>
+
+  <!-- Arrow down to AST -->
+  <line x1="400" y1="156" x2="400" y2="186" stroke="#6366f1" stroke-width="2"/>
+  <polygon points="393,182 400,192 407,182" fill="#6366f1"/>
+
+  <!-- AST box -->
+  <rect x="310" y="192" width="180" height="50" rx="10" fill="url(#purple)" filter="url(#shadow)"/>
+  <text x="400" y="216" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" font-weight="600" fill="white">AST</text>
+  <text x="400" y="233" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#c7d2fe">Portable</text>
+
+  <!-- Fan-out arrows -->
+  <line x1="340" y1="242" x2="100" y2="290" stroke="#10b981" stroke-width="2"/>
+  <line x1="370" y1="242" x2="260" y2="290" stroke="#10b981" stroke-width="2"/>
+  <line x1="400" y1="242" x2="400" y2="290" stroke="#10b981" stroke-width="2"/>
+  <line x1="430" y1="242" x2="540" y2="290" stroke="#10b981" stroke-width="2"/>
+  <line x1="460" y1="242" x2="700" y2="290" stroke="#10b981" stroke-width="2"/>
+
+  <!-- Arrow tips -->
+  <polygon points="94,286 100,296 106,286" fill="#10b981"/>
+  <polygon points="254,286 260,296 266,286" fill="#10b981"/>
+  <polygon points="394,286 400,296 406,286" fill="#10b981"/>
+  <polygon points="534,286 540,296 546,286" fill="#10b981"/>
+  <polygon points="694,286 700,296 706,286" fill="#10b981"/>
+
+  <!-- Generator boxes -->
+  <rect x="30" y="296" width="140" height="50" rx="10" fill="url(#green)" filter="url(#shadow)"/>
+  <text x="100" y="318" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="white">Schema</text>
+  <text x="100" y="335" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#d1fae5">Drizzle / SQL</text>
+
+  <rect x="190" y="296" width="140" height="50" rx="10" fill="url(#green)" filter="url(#shadow)"/>
+  <text x="260" y="318" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="white">Types</text>
+  <text x="260" y="335" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#d1fae5">TypeScript / Zod</text>
+
+  <rect x="340" y="296" width="120" height="50" rx="10" fill="url(#green)" filter="url(#shadow)"/>
+  <text x="400" y="318" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="white">API</text>
+  <text x="400" y="335" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#d1fae5">Routes + Auth</text>
+
+  <rect x="480" y="296" width="120" height="50" rx="10" fill="url(#green)" filter="url(#shadow)"/>
+  <text x="540" y="318" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="white">UI</text>
+  <text x="540" y="335" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#d1fae5">Forms + Tables</text>
+
+  <rect x="630" y="296" width="140" height="50" rx="10" fill="url(#green)" filter="url(#shadow)"/>
+  <text x="700" y="318" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="white">Tests</text>
+  <text x="700" y="335" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#d1fae5">Unit + Integration</text>
+
+  <!-- Bottom label -->
+  <text x="400" y="385" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#94a3b8">One parser. Many generators. Zero AI in the pipeline.</text>
+
+  <!-- Input adapters (left side) -->
+  <rect x="20" y="106" width="130" height="50" rx="10" fill="none" stroke="#475569" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="85" y="128" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#94a3b8">Input Adapters</text>
+  <text x="85" y="145" text-anchor="middle" font-family="system-ui, sans-serif" font-size="10" fill="#64748b">OpenAPI / SQL / GQL</text>
+
+  <!-- Arrow from adapters to parser -->
+  <line x1="150" y1="131" x2="310" y2="131" stroke="#475569" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <polygon points="306,127 314,131 306,135" fill="#475569"/>
+</svg>

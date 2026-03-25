@@ -1,6 +1,8 @@
 <div align="center">
 
-# Kappa
+<img src="assets/logo.svg" alt="Kappa" width="120" height="120" />
+
+<h1>Kappa</h1>
 
 **Describe an application once. Generate everything from it.**
 
@@ -37,7 +39,7 @@ User {
 
 ---
 
-## Why Kappa
+## <img src="https://img.shields.io/badge/-Why_Kappa-6366f1?style=for-the-badge" alt="Why Kappa" />
 
 Building an application means expressing the same decisions in multiple syntaxes:
 
@@ -56,7 +58,7 @@ Kappa captures the truth once. Everything else is derived.
 
 ---
 
-## The Notation
+## <img src="https://img.shields.io/badge/-The_Notation-8b5cf6?style=for-the-badge" alt="The Notation" />
 
 ### Dense — for data models
 
@@ -132,40 +134,17 @@ Both notations mix freely in the same file. Both produce the same AST.
 
 ---
 
-## How It Works
+## <img src="https://img.shields.io/badge/-How_It_Works-3b82f6?style=for-the-badge" alt="How It Works" />
 
-```
-                          ┌─────────────────┐
-                          │   .kappa file    │
-                          └────────┬────────┘
-                                   │
-                                   ▼
-                          ┌─────────────────┐
-                          │     Parser      │  Deterministic
-                          └────────┬────────┘
-                                   │
-                                   ▼
-                          ┌─────────────────┐
-                          │      AST        │  Portable
-                          └───┬────┬────┬───┘
-                              │    │    │
-              ┌───────────────┤    │    ├───────────────┐
-              ▼               ▼    ▼    ▼               ▼
-        ┌───────────┐  ┌──────┐  ┌──────┐  ┌──────┐  ┌──────┐
-        │  Schema   │  │ Types│  │ API  │  │  UI  │  │ Tests│
-        │ Generator │  │ Gen  │  │ Gen  │  │ Gen  │  │ Gen  │
-        └───────────┘  └──────┘  └──────┘  └──────┘  └──────┘
-```
-
-**One parser. Many generators. Zero AI in the pipeline.**
+<img src="assets/pipeline.svg" alt="Kappa Pipeline" width="800" />
 
 The parser reads `.kappa` files and produces a structured AST. Code generators read the AST and emit target-specific code. Each generator is deterministic — same AST in, same code out.
 
-The parser also works in reverse: input adapters read existing schemas (OpenAPI, SQL DDL, GraphQL SDL, Prisma) and produce Kappa specs from them.
+Input adapters work in reverse: they read existing schemas (OpenAPI, SQL DDL, GraphQL SDL, Prisma) and produce Kappa specs from them.
 
 ---
 
-## Complete Example
+## <img src="https://img.shields.io/badge/-Complete_Example-10b981?style=for-the-badge" alt="Complete Example" />
 
 A multi-tenant SaaS task manager in ~40 lines:
 
@@ -218,7 +197,7 @@ From this spec, generators produce: database schema with relations, TypeScript t
 
 ---
 
-## Documentation
+## <img src="https://img.shields.io/badge/-Documentation-f59e0b?style=for-the-badge" alt="Documentation" />
 
 | Document | Description |
 |----------|-------------|
