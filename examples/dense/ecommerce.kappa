@@ -1,7 +1,7 @@
 // E-commerce product catalog with orders
 
-Category { id: id*, name: s*, slug: s*@, parent: Category?, sort_order: i=0 }
-Product { id: id*, sku: s*@~(8,20), name: s*(1,200), description: t, price: i*(0,), compare_at_price: i?, stock: i*(0,)=0, status: (draft|active|discontinued)=draft, category: Category*, images: [s], weight_grams: i?, created: dt!, updated: dt }
-Customer { id: id*, email: s*@~, name: s*, phone: s?, address_line1: s?, address_line2: s?, city: s?, state: s?, postal_code: s?, country: s*(2,2)="AU", created: dt! }
-Order { id: id*, customer: Customer*, status: (pending|paid|shipped|delivered|cancelled|refunded)=pending, subtotal: i*(0,), tax: i*(0,)=0, shipping: i*(0,)=0, total: i*(0,), currency: s*(3,3)="AUD", notes: t?, shipped_at: dt?, created: dt!, updated: dt }
-OrderLine { id: id*, order: Order*, product: Product*, quantity: i*(1,), unit_price: i*, total: i*, line_number: i++ }
+Category { name: s, slug: s@#slug, parent: Category?, sort_order: i=0 }
+Product { sku: s@~(8,20), name: s(1,200), description: t, price: m(0,), compare_at_price: m?, stock: i(0,)=0, status: (draft|active|discontinued)=draft, category: Category, images: [s], weight_grams: i?, created: dt!^, updated: dt^ }
+Customer { email: s@~#email, name: s, phone: s?, address_line1: s?, address_line2: s?, city: s?, state: s?, postal_code: s?, country: s(2,2)="AU", created: dt!^ }
+Order { customer: Customer, status: (pending|paid|shipped|delivered|cancelled|refunded)=pending, subtotal: m(0,), tax: m(0,)=0, shipping: m(0,)=0, total: m(0,), currency: s(3,3)="AUD", notes: t?, shipped_at: dt?, created: dt!^, updated: dt^ }
+OrderLine { order: Order, product: Product, quantity: i(1,), unit_price: m, total: m, line_number: i++ }

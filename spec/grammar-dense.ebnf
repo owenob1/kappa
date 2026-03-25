@@ -2,20 +2,30 @@
 (* ISO/IEC 14977 EBNF Notation *)
 (* Compact, minimal syntax for rapid specification of data models *)
 
+(* Fields are required by default. Use "?" for optional/nullable. *)
+
 (* === DOCUMENT STRUCTURE === *)
 
 kappa_document =
-  entity_definition ,
-  { entity_definition } ;
+  { enum_declaration | entity_definition } ;
+
+(* Named enum declaration *)
+enum_declaration =
+  "enum" , entity_name , "(" , enum_value , { "|" , enum_value } , ")" ;
 
 entity_definition =
-  entity_name , entity_body ;
+  [ enum_declaration ] ,
+  entity_name , entity_body , { entity_constraint } ;
 
 entity_name =
   letter , { letter | digit } ;  (* PascalCase *)
 
 entity_body =
   "{" , [ field_list ] , "}" ;
+
+(* Entity-level constraints *)
+entity_constraint =
+  "@" , ( "unique" | "index" ) , "(" , field_name , { "," , field_name } , ")" ;
 
 (* === FIELDS === *)
 
@@ -34,6 +44,7 @@ field_type =
   type_code |
   array_type |
   reference_type |
+  named_enum_ref |
   enum_type ;
 
 (* Type codes: compact single/double letter notation *)
@@ -42,6 +53,7 @@ type_code =
   "t" |      (* text - unbounded *)
   "i" |      (* integer *)
   "f" |      (* float *)
+  "m" |      (* decimal/money *)
   "b" |      (* boolean *)
   "d" |      (* date *)
   "dt" |     (* datetime *)
@@ -53,6 +65,9 @@ array_type =
 
 reference_type =
   entity_name ;  (* Bare entity name = foreign key *)
+
+named_enum_ref =
+  entity_name ;  (* Reference to a named enum declared with enum_declaration *)
 
 enum_type =
   "(" , enum_value , { "|" , enum_value } , ")" ;
@@ -66,12 +81,14 @@ field_modifiers =
   { field_modifier } ;
 
 field_modifier =
-  "*" |                    (* primary key / required *)
+  "*" |                    (* required - emphasis only, fields are required by default *)
   "?" |                    (* optional / nullable *)
   "!" |                    (* immutable *)
   "~" |                    (* indexed *)
   "@" |                    (* unique *)
+  "^" |                    (* hidden/internal - not exposed in API or UI *)
   "++" |                   (* auto-increment *)
+  "#" , identifier |       (* format annotation: email, url, phone, uuid, slug, ip, hex *)
   "=" , literal |          (* default value *)
   "(" , number , ")" |     (* min length/value *)
   "(" , number , "," , number , ")" ;  (* min,max *)
@@ -115,7 +132,7 @@ computation =
 (* === CAPABILITIES & ACCESS === *)
 
 capability_declaration =
-  "#" , capability_type ,
+  "capability" , capability_type ,
   [ "(" , entity_name , ")" ] ;
 
 capability_type =

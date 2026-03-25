@@ -1,0 +1,6 @@
+[package]
+name = "kappa-parser"
+version = "0.1.0"
+edition = "2021"
+description = "Kappa dense notation parser"
+license = "MIT"

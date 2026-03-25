@@ -1,0 +1,15 @@
+{
+  "name": "@kappa-lang/generator",
+  "version": "0.1.0",
+  "description": "Generates Kappa dense notation parsers for multiple languages",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "generate": "node dist/generate.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.15",
+    "typescript": "^5.4.0"
+  },
+  "license": "MIT"
+}

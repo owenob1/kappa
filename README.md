@@ -45,10 +45,10 @@ For AI-assisted development, this is worse: an LLM spends 70–80% of its contex
 ## The fix
 
 ```kappa
-User { id: id*, email: s*@~, name: s*(1,100), role: (admin|editor|viewer), active: b=true, created: dt! }
+User { email: s@~#email, name: s(1,100), role: (admin|editor|viewer), active: b=true, created: dt!^ }
 ```
 
-One line. Six fields. Every decision is explicit: required (`*`), unique (`@`), indexed (`~`), length-constrained (`(1,100)`), defaulted (`=true`), immutable (`!`).
+One line. Five fields. Every decision is explicit: unique (`@`), indexed (`~`), format-annotated (`#email`), length-constrained (`(1,100)`), defaulted (`=true`), immutable (`!`), hidden (`^`). Fields are required by default — no `*` needed.
 
 A parser reads this single line and generates the database column, the TypeScript type, the validation rule, the API endpoint, the form input, and the test case for every field.
 
@@ -87,23 +87,27 @@ The parser is deterministic. The generators are deterministic. Input adapters re
 The compact syntax. One entity per line.
 
 ```kappa
-Product { id: id*, sku: s*@~(8,20), name: s*(1,200), price: f*(0.01,), stock: i(0,)=0, status: (draft|active|discontinued), category: Category*, created: dt! }
+Product { sku: s@~(8,20), name: s(1,200), price: m(0.01,), stock: i(0,)=0, status: (draft|active|discontinued), category: Category, created: dt!^ }
 ```
+
+Fields are required by default. Use `?` for optional/nullable.
 
 **Quick reference**
 
 | Code | Type | &nbsp; | Modifier | Meaning |
 |------|------|---|----------|---------|
-| `s` | String | | `*` | Required |
-| `t` | Text | | `?` | Optional |
+| `s` | String | | `?` | Optional |
+| `t` | Text | | `*` | Required (emphasis) |
 | `i` | Integer | | `!` | Immutable |
 | `f` | Float | | `~` | Indexed |
-| `b` | Boolean | | `@` | Unique |
+| `m` | Decimal | | `@` | Unique |
+| `b` | Boolean | | `^` | Hidden (internal) |
 | `d` | Date | | `=val` | Default |
 | `dt` | DateTime | | `(min,max)` | Constraint |
-| `id` | Identifier | | `++` | Auto-increment |
+| `id` | Identifier | | `#fmt` | Format annotation |
+| `x` | Binary | | `++` | Auto-increment |
 
-References: `author: User*` &nbsp;&mdash;&nbsp; Enums: `(a|b|c)` &nbsp;&mdash;&nbsp; Arrays: `[s]`
+References: `author: User` (required) &nbsp;&mdash;&nbsp; `team: Team?` (optional) &nbsp;&mdash;&nbsp; Enums: `(a|b|c)` &nbsp;&mdash;&nbsp; Named enums: `enum Role (a|b|c)` &nbsp;&mdash;&nbsp; Arrays: `[s]`
 
 > Full reference: [Dense Notation Spec](spec/dense-notation.md)
 
@@ -167,12 +171,15 @@ Both syntaxes mix in the same file. Both produce the same AST.
 
 The specification is **stable**. The toolchain is under active development:
 
-- [x] Language specification
+- [x] Language specification (v2 — required-by-default, implicit id, `m` decimal, `^` hidden, `#format`, named enums, `@unique`)
 - [x] Dense and full syntax with unified AST
 - [x] Formal EBNF grammars
-- [ ] Reference parser (TypeScript)
+- [x] Parser generator — one script produces parsers for 5 languages
+- [x] Reference parsers (TypeScript, Python, Rust, Go, Java)
+- [x] Streaming parser (character-by-character, emits on comma)
+- [x] Cross-language test suite (80 AST tests + 13,500 property-based + fuzz)
 - [ ] Input adapters (OpenAPI, SQL, GraphQL → Kappa)
-- [ ] Output generators (Prisma, Zod, tRPC, React)
+- [ ] Output generators (Drizzle, Zod, tRPC, React)
 - [ ] CLI tooling
 - [ ] VS Code extension with syntax highlighting
 

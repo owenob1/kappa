@@ -58,8 +58,8 @@ You can combine both notations in the same file:
 ```kappa
 User {
   // Dense notation for simple fields
-  email: s*@
-  age: i*(18,)
+  email: s@~#email
+  age: i(18,)
 
   // Full syntax for computed field
   is_adult: Boolean = fn() => this.age >= 18
@@ -72,53 +72,117 @@ User {
 
 Dense notation is Kappa's ultra-compact syntax for data models.
 
+### Implicit ID
+
+Every entity automatically has an `id` field (UUID/ULID primary key). You don't need to declare it:
+
+```kappa
+// These are equivalent:
+User { email: s@~#email, name: s }
+User { id: id, email: s@~#email, name: s }
+```
+
+### Required by Default
+
+Fields are required (NOT NULL) unless explicitly marked optional with `?`.
+
+- No modifier = required
+- `?` = optional (nullable)
+- `*` = allowed for emphasis (redundant, same as no modifier)
+- `=value` = has default (required in DB, optional in input)
+
 ### Type Codes
 
 | Code | Type | Example |
 |------|------|---------|
-| `s` | String (bounded) | `name: s*` |
+| `s` | String (bounded) | `name: s` |
 | `t` | Text (unbounded) | `bio: t` |
-| `i` | Integer | `age: i*(18,)` |
+| `i` | Integer | `age: i(18,)` |
 | `f` | Float | `price: f(0.01,)` |
+| `m` | Decimal (128-bit fixed-point) | `price: m(0.01,)` |
 | `b` | Boolean | `active: b` |
 | `d` | Date | `birthday: d` |
 | `dt` | DateTime | `created: dt` |
-| `id` | Identifier (auto PK) | `id: id*` |
+| `id` | Identifier (auto PK) | `id: id` |
 | `x` | Binary/Blob | `avatar: x` |
 
 ### Field Modifiers
 
 | Modifier | Meaning | Example |
 |----------|---------|---------|
-| `*` | Required | `email: s*` |
 | `?` | Optional (nullable) | `phone: s?` |
+| `*` | Required (emphasis) | `email: s*` |
 | `!` | Immutable (write-once) | `created: dt!` |
-| `~` | Indexed | `username: s*~` |
-| `@` | Unique | `email: s*@` |
+| `~` | Indexed | `username: s~` |
+| `@` | Unique | `email: s@` |
+| `^` | Hidden (internal) | `hash: s^` |
 | `++` | Auto-increment | `counter: i++` |
+| `#format` | Format annotation | `email: s#email` |
 | `=value` | Default value | `active: b=true` |
 
 ### Constraints
 
 ```kappa
-age: i*(18,)      // Min 18, no max
-password: s*(8,)  // Min 8 chars
+age: i(18,)       // Min 18, no max
+password: s(8,)   // Min 8 chars
 rating: f(1,5)    // Between 1 and 5
 ```
 
 ### Modifiers Stack
 
 ```kappa
-email: s*@~       // Required, unique, indexed
-slug: s*@!(3,)    // Required, unique, immutable, min 3 chars
+email: s@~#email  // Unique, indexed, email format
+slug: s@!(3,)#slug // Unique, immutable, min 3 chars, slug format
+```
+
+### Hidden Fields
+
+The `^` modifier marks fields as internal — not exposed in API input, output, or UI:
+
+```kappa
+password_hash: s^        // database only, never in API
+api_key_hash: s!^        // immutable + hidden
+created: dt!^            // server-generated timestamp
+updated: dt^             // auto-updated timestamp
+```
+
+### Format Annotations
+
+Semantic format hints that guide validation and display:
+
+```kappa
+email: s@~#email     // email format
+website: s?#url      // URL format
+phone: s?#phone      // phone number format
+slug: s@!#slug       // URL-safe slug
+```
+
+Standard formats: `email`, `url`, `phone`, `uuid`, `slug`, `ip`, `hex`
+
+### Named Enums
+
+Define reusable enum types:
+
+```kappa
+enum Status (draft|active|archived)
+enum Role (admin|editor|viewer)
+
+Post { title: s, status: Status=draft }
+User { name: s, role: Role=viewer }
 ```
 
 ### References
 
 ```kappa
-author: User*     // Foreign key to User (required)
-team: Team?       // Foreign key to Team (optional)
+author: User      // Required foreign key to User (RESTRICT on delete)
+team: Team?       // Optional foreign key to Team (SET NULL on delete)
+org: Organization! // Required, immutable foreign key
 ```
+
+### Cascade Defaults
+
+- Required reference (`User`) → RESTRICT (prevent deletion while children exist)
+- Optional reference (`User?`) → SET NULL (remove the link, keep the child)
 
 ### Enums
 
@@ -134,20 +198,38 @@ tags: [s]         // Array of strings
 scores: [i]       // Array of integers
 ```
 
+### Entity Constraints
+
+Composite constraints declared after the entity body:
+
+```kappa
+User { org: Organization, email: s@~#email } @unique(org, email)
+Product { sku: s@, warehouse: Warehouse } @unique(sku, warehouse) @index(warehouse, status)
+```
+
+### Canonical Modifier Order
+
+Recommended order for consistency:
+
+required/optional → immutable → unique → indexed → hidden → auto-increment → constraint → format → default
+
+`email: s!@~^(5,255)#email="default"`
+
 ### Example: E-commerce Product
 
 ```kappa
+enum ProductStatus (draft|active|discontinued)
+
 Product {
-  id: id*,
-  sku: s*@~(8,20),
-  name: s*(1,200),
+  sku: s@~(8,20),
+  name: s(1,200),
   description: t,
-  price: f*(0.01,),
+  price: m(0.01,),
   stock: i(0,)=0,
-  status: (draft|active|discontinued),
+  status: ProductStatus=draft,
   images: [s],
-  created: dt!,
-  updated: dt
+  created: dt!^,
+  updated: dt^
 }
 ```
 
@@ -360,6 +442,7 @@ Kappa employs a **static, gradually-typed system** with **Hindley-Milner type in
 | `Text` | `t` | Long text (unlimited) |
 | `Integer` | `i` | 64-bit signed integer |
 | `Float` | `f` | 64-bit IEEE 754 float |
+| `Decimal` | `m` | 128-bit fixed-point decimal |
 | `Boolean` | `b` | True or false |
 | `Date` | `d` | Calendar date |
 | `DateTime` | `dt` | ISO 8601 timestamp |
@@ -466,14 +549,14 @@ The grammar requires no lookahead and no backtracking. Fields are delimited by `
 
 - **Token-by-token parsing.** As an LLM streams output, the parser processes each token as it arrives. No buffering of the complete entity is needed.
 - **Incremental code generation.** A generator can emit the schema column for `email` while the model is still generating the next field. The database migration begins before the spec is fully written.
-- **Partial validity.** `User { id: id*, email: s*@~` is a valid partial parse — two complete fields — even though the entity isn't closed. Generators can produce code for the fields they've seen so far.
+- **Partial validity.** `User { email: s@~#email, name: s` is a valid partial parse — two complete fields — even though the entity isn't closed. Generators can produce code for the fields they've seen so far.
 - **Error locality.** A malformed field doesn't invalidate preceding fields. The parser reports the error at the exact token and continues parsing subsequent fields.
 
 ```
-LLM token stream:  U s e r { i d : i d * , e m a i l : s * @ ~ ,
-                                          ↑                      ↑
-                                    emit field 1           emit field 2
-                                    (id: id*)              (email: s*@~)
+LLM token stream:  U s e r { e m a i l : s @ ~ # e m a i l , n a m e : s ,
+                                                             ↑              ↑
+                                                       emit field 1   emit field 2
+                                                       (email: s@~)   (name: s)
 ```
 
 This property emerges from the grammar's design, not from parser implementation. The EBNF rules use only right-recursive and iterative constructs — no left recursion, no ambiguous alternations requiring backtracking, no context-sensitive rules.

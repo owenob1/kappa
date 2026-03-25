@@ -1,8 +1,8 @@
 // Quantum computing lab management (modelled on IBM Quantum/Qiskit entities)
 
-Backend { id: id*, name: s*@, provider: (ibm|google|aws|ionq|rigetti), qubit_count: i*(1,), status: (online|offline|maintenance|retired), topology: s?, gate_set: [s], max_shots: i*, queue_depth: i*(0,)=0, calibration_date: dt?, created: dt! }
-Circuit { id: id*, name: s*, description: t?, qubit_count: i*(1,), depth: i*(1,), gate_count: i*(1,), qasm: t*, author: s*, tags: [s], created: dt! }
-Job { id: id*, circuit: Circuit*, backend: Backend*, shots: i*(1,)=1024, status: (queued|running|completed|failed|cancelled)=queued, priority: (low|normal|high)=normal, queued_at: dt!, started_at: dt?, completed_at: dt? }
-Result { id: id*, job: Job*, counts: t*, fidelity: f?(0,1), execution_time_ms: i?, error_rate: f?(0,1), raw_data: t?, created: dt! }
-Experiment { id: id*, name: s*, hypothesis: t*, circuits: [Circuit], status: (design|running|analyzing|published)=design, conclusion: t?, paper: s?, created: dt!, updated: dt }
-Calibration { id: id*, backend: Backend*, t1_us: f*, t2_us: f*, readout_error: f*(0,1), gate_errors: t*, date: dt! }
+Backend { name: s@, provider: (ibm|google|aws|ionq|rigetti), qubit_count: i(1,), status: (online|offline|maintenance|retired), topology: s?, gate_set: [s], max_shots: i, queue_depth: i(0,)=0, calibration_date: dt?, created: dt!^ }
+Circuit { name: s, description: t?, qubit_count: i(1,), depth: i(1,), gate_count: i(1,), qasm: t, author: s, tags: [s], created: dt!^ }
+Job { circuit: Circuit, backend: Backend, shots: i(1,)=1024, status: (queued|running|completed|failed|cancelled)=queued, priority: (low|normal|high)=normal, queued_at: dt!^, started_at: dt?, completed_at: dt? }
+Result { job: Job, counts: t, fidelity: f?(0,1), execution_time_ms: i?, error_rate: f?(0,1), raw_data: t?, created: dt!^ }
+Experiment { name: s, hypothesis: t, circuits: [Circuit], status: (design|running|analyzing|published)=design, conclusion: t?, paper: s?, created: dt!^, updated: dt^ }
+Calibration { backend: Backend, t1_us: f, t2_us: f, readout_error: f(0,1), gate_errors: t, date: dt!^ }
