@@ -10,6 +10,7 @@ Quick reference for Kappa dense notation syntax.
 - **Single-glance readability** - Type visible immediately
 - **No cognitive overhead** - Obvious after first example
 - **Copy-paste friendly** - No indentation sensitivity
+- **Stream-parseable** - Left-to-right, single-pass, no lookahead. Each field emits a complete AST node on the delimiter (`,` or `}`), enabling incremental code generation from LLM token streams
 
 ---
 

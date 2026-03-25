@@ -48,6 +48,8 @@ For AI-assisted development, the cost is compounded: an LLM spends most of its c
 
 The parser is deterministic. The generators are deterministic. Input adapters read existing schemas (OpenAPI, SQL, GraphQL) and produce Kappa. Output generators read Kappa and produce code for any stack. Same spec, different targets.
 
+**Streaming parse.** The dense notation parses incrementally, token by token — no buffering, no lookahead. Each field emits a complete AST node on the comma delimiter. When an LLM streams Kappa output, code generation begins before the spec is fully written. The schema column for `email` can be generated while the model is still producing the next field.
+
 ## Dense notation
 
 The compact syntax. One entity per line.
@@ -115,6 +117,7 @@ Both syntaxes mix in the same file. Both produce the same AST.
 | [Compiler Pipeline](examples/dense/compiler-pipeline.kappa) | Source files, AST, symbols, IR, diagnostics |
 | [Quantum Lab](examples/dense/quantum-lab.kappa) | Backends, circuits, jobs, calibration |
 | [Order with Logic](examples/full/order-with-logic.kappa) | Computed fields, authorization, workflows |
+| [Streaming Parse](examples/streaming/incremental-parse.md) | Token-by-token incremental parsing from LLM output |
 
 ## Specification
 

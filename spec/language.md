@@ -458,6 +458,26 @@ All code generation is deterministic:
 - Files are checksummed (SHA-256) to detect changes
 - Templates are cached and versioned
 
+### Streaming Parse
+
+Kappa's dense notation is designed for incremental, left-to-right, single-pass parsing — including from a live token stream.
+
+The grammar requires no lookahead and no backtracking. Fields are delimited by `,`. The parser can emit a complete field AST node the moment it encounters a comma or closing `}`. This means:
+
+- **Token-by-token parsing.** As an LLM streams output, the parser processes each token as it arrives. No buffering of the complete entity is needed.
+- **Incremental code generation.** A generator can emit the schema column for `email` while the model is still generating the next field. The database migration begins before the spec is fully written.
+- **Partial validity.** `User { id: id*, email: s*@~` is a valid partial parse — two complete fields — even though the entity isn't closed. Generators can produce code for the fields they've seen so far.
+- **Error locality.** A malformed field doesn't invalidate preceding fields. The parser reports the error at the exact token and continues parsing subsequent fields.
+
+```
+LLM token stream:  U s e r { i d : i d * , e m a i l : s * @ ~ ,
+                                          ↑                      ↑
+                                    emit field 1           emit field 2
+                                    (id: id*)              (email: s*@~)
+```
+
+This property emerges from the grammar's design, not from parser implementation. The EBNF rules use only right-recursive and iterative constructs — no left recursion, no ambiguous alternations requiring backtracking, no context-sensitive rules.
+
 ---
 
 ## Standard Library
@@ -558,7 +578,8 @@ entity Task {
 4. **Multi-Tenancy Primitives** - Scope isolation built into the language
 5. **Graph-Based Authorization** - Membership paths computed automatically
 6. **Workflow Orchestration** - Declarative state machines
-7. **Incremental Generation** - Only regenerate changed components
-8. **Deterministic Output** - Same input -> same checksum
-9. **Zero Runtime** - Compiles to native target code
-10. **Target-Agnostic** - Write once, generate TypeScript, Python, Go, etc.
+7. **Streaming Parse** - Token-by-token incremental parsing from LLM output streams
+8. **Incremental Generation** - Only regenerate changed components
+9. **Deterministic Output** - Same input -> same checksum
+10. **Zero Runtime** - Compiles to native target code
+11. **Target-Agnostic** - Write once, generate TypeScript, Python, Go, etc.
