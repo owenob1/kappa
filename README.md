@@ -213,6 +213,9 @@ From this spec, generators produce: database schema with relations, TypeScript t
 | [Blog](examples/dense/user-blog.kappa) | Dense | Users, posts, comments, references, enums |
 | [E-commerce](examples/dense/ecommerce.kappa) | Dense | Products, orders, line items, integer-cents pattern |
 | [SaaS Project Manager](examples/dense/saas-multitenant.kappa) | Dense | Multi-tenancy, roles, task hierarchy, labels |
+| [Compiler Pipeline](examples/dense/compiler-pipeline.kappa) | Dense | Source files, AST nodes, symbols, IR, basic blocks, diagnostics |
+| [ML Platform](examples/dense/ml-platform.kappa) | Dense | Experiments, runs, datasets, models, versioned artifacts |
+| [Quantum Lab](examples/dense/quantum-lab.kappa) | Dense | Backends, circuits, jobs, results, calibration data |
 | [Order with Logic](examples/full/order-with-logic.kappa) | Full | Computed fields, pattern matching, authorization, workflows |
 
 ---

@@ -1,0 +1,8 @@
+// ML experiment tracking and model registry (modelled on MLflow entities)
+
+Dataset { id: id*, name: s*@, source: s*, version: s?, rows: i?, features: i?, size_bytes: i?, format: (csv|parquet|json|tfrecord|huggingface), hash: s?, created: dt! }
+Experiment { id: id*, name: s*@, description: t?, owner: s*, status: (active|archived)=active, created: dt! }
+Run { id: id*, experiment: Experiment*, name: s?, status: (running|completed|failed|killed)=running, params: t="{}",  metrics: t="{}", tags: [s], git_commit: s?, started: dt!, ended: dt?, duration_ms: i? }
+Artifact { id: id*, run: Run*, path: s*, size_bytes: i*, mime_type: s?, storage_uri: s*, created: dt! }
+Model { id: id*, name: s*@, description: t?, run: Run?, framework: (pytorch|tensorflow|sklearn|xgboost|onnx|custom), format: s?, created: dt! }
+ModelVersion { id: id*, model: Model*, version: i*@, stage: (none|staging|production|archived)=none, artifact: Artifact*, metrics: t="{}", created: dt! }

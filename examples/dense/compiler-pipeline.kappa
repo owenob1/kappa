@@ -1,0 +1,9 @@
+// Compiler pipeline — source to executable (modelled on LLVM/GCC architecture)
+
+SourceFile { id: id*, path: s*@, language: (c|cpp|rust|go|swift|zig)*, size_bytes: i*(0,), hash: s*!, encoding: s="utf-8", parsed_at: dt? }
+Token { id: id*, source: SourceFile*, type: (keyword|identifier|literal|operator|punctuation|comment|whitespace)*, lexeme: s*, line: i*(1,), col: i*(1,), span: i*(1,) }
+ASTNode { id: id*, source: SourceFile*, type: s*, parent: ASTNode?, depth: i*(0,), start_line: i*(1,), end_line: i*(1,), symbol_name: s?, exported: b=false }
+Symbol { id: id*, node: ASTNode*, name: s*~, kind: (function|variable|type|constant|macro|module)*, scope: s*, type_signature: s?, visibility: (public|private|internal)=private }
+IRInstruction { id: id*, block: BasicBlock*, opcode: s*, operands: [s], result_type: s?, position: i++ }
+BasicBlock { id: id*, function: Symbol*, label: s*@, predecessors: [BasicBlock], successors: [BasicBlock] }
+Diagnostic { id: id*, source: SourceFile*, severity: (error|warning|note|hint)*, code: s?, message: t*, line: i*(1,), col: i*(1,), fix_suggestion: t? }
