@@ -1,10 +1,8 @@
 # Kappa
 
-A compact notation for describing application data models, constraints, relationships, authorization, and workflows.
+**Describe an application once. Generate everything from it.**
 
----
-
-## Example
+Kappa is a specification language that captures data models, constraints, relationships, authorization rules, and workflows in a compact, unambiguous notation. One `.kappa` file replaces the 6+ files that typically describe the same information in different syntaxes — and any of those files can be generated from it.
 
 ```kappa
 User {
@@ -15,41 +13,47 @@ User {
   active: b=true,
   created: dt!
 }
-
-Post {
-  id: id*,
-  title: s*(3,200),
-  content: t*,
-  author: User*,
-  status: (draft|published|archived),
-  tags: [s],
-  created: dt!
-}
 ```
 
-## Why
+Six fields. Six decisions made explicit in 7 lines:
+- `email` is required (`*`), unique (`@`), and indexed (`~`)
+- `name` has a length constraint: 1-100 characters
+- `role` is one of exactly three values
+- `active` defaults to `true`
+- `created` is immutable (`!`) — set once, never changed
 
-Building an application requires the same information repeated in different forms — database schemas, type definitions, validation rules, API endpoints, UI components, tests. Each repetition is an opportunity for drift, inconsistency, and bugs.
+---
 
-Kappa captures that information once, in a notation designed to make every decision visible:
+## The Problem
 
-| Kappa | Meaning |
-|-------|---------|
-| `s*` | Required string |
-| `s?` | Optional string |
-| `s*@` | Required, unique |
-| `s*@~` | Required, unique, indexed |
-| `s*(3,200)` | Required, 3-200 characters |
-| `i*(0,)` | Required integer, minimum 0 |
-| `dt!` | Immutable timestamp |
-| `b=true` | Boolean, defaults to true |
-| `User*` | Required reference to User |
-| `(a\|b\|c)` | Enum: one of a, b, or c |
-| `[s]` | Array of strings |
+Building an application means writing the same information over and over:
 
-## Dense Notation
+```
+schema.sql          →  CREATE TABLE users (email TEXT NOT NULL UNIQUE ...)
+types.ts            →  interface User { email: string; ... }
+validators.ts       →  z.object({ email: z.string().email() ... })
+api/users/route.ts  →  export async function GET(req) { ... }
+components/User.tsx →  <input name="email" required ... />
+tests/user.test.ts  →  it('should reject missing email', () => { ... })
+```
 
-For data models — fields, types, constraints, relationships:
+Six files. One truth. Every repetition is an opportunity for drift, inconsistency, and bugs. Change the email constraint in the schema but forget the validator — now invalid data gets through. Add a field to the type but not the API — now the frontend crashes.
+
+Kappa captures the truth once:
+
+```kappa
+email: s*@~
+```
+
+Everything else — the schema column, the TypeScript type, the Zod validator, the API endpoint, the form input, the test case — is derivable from those four characters.
+
+---
+
+## How It Works
+
+### 1. Write the spec
+
+A `.kappa` file describes what your application IS — its entities, their fields, their constraints, their relationships, and their behavior.
 
 ```kappa
 Product {
@@ -66,23 +70,94 @@ Product {
 }
 ```
 
+### 2. Parse to AST
+
+The Kappa parser reads `.kappa` files and produces a structured AST (Abstract Syntax Tree). The AST is the portable representation — it captures every decision in a machine-readable format that any code generator can consume.
+
+```
+.kappa file → Parser → AST (JSON)
+```
+
+The parser is deterministic. Same input → same AST. No AI, no inference, no ambiguity.
+
+### 3. Generate for your target
+
+Code generators read the AST and emit code for a specific technology stack. Each generator is a set of templates that map Kappa concepts to target-specific implementations.
+
+```
+AST → Drizzle Generator  → db/schema.ts
+AST → Zod Generator      → validators/product.ts
+AST → API Generator      → api/products/route.ts
+AST → React Generator    → components/ProductForm.tsx
+AST → Test Generator     → tests/product.test.ts
+```
+
+Each generator is deterministic. Same AST → same output, byte-for-byte. Different target stacks get different generators, but the Kappa spec stays the same.
+
+---
+
+## Dense Notation
+
+The compact syntax for data models. Designed for single-glance readability — every field is 5-7 characters.
+
+### Type Codes
+
+| Code | Type | Example |
+|------|------|---------|
+| `s` | String (max 255 chars) | `name: s*` |
+| `t` | Text (unlimited) | `bio: t` |
+| `i` | Integer | `age: i*(18,)` |
+| `f` | Float | `price: f*(0.01,)` |
+| `b` | Boolean | `active: b` |
+| `d` | Date | `birthday: d` |
+| `dt` | DateTime | `created: dt` |
+| `id` | Identifier (auto PK) | `id: id*` |
+
+### Modifiers
+
+| Modifier | Meaning | Example |
+|----------|---------|---------|
+| `*` | Required | `email: s*` |
+| `?` | Optional (nullable) | `phone: s?` |
+| `!` | Immutable | `created: dt!` |
+| `~` | Indexed | `username: s*~` |
+| `@` | Unique | `email: s*@` |
+| `=value` | Default | `active: b=true` |
+| `(min,max)` | Constraint | `age: i*(18,120)` |
+
+Modifiers stack: `email: s*@~` means required, unique, indexed.
+
+### References and Enums
+
+```kappa
+author: User*                          // Required foreign key
+team: Team?                            // Optional foreign key
+status: (draft|published|archived)     // Enum
+tags: [s]                              // Array of strings
+```
+
+---
+
 ## Full Syntax
 
-For logic that dense notation can't express — computed fields, authorization, workflows:
+For logic that dense notation can't express — computed fields, authorization, workflows.
 
 ```kappa
 entity Order {
   items: [OrderItem]
   status: (pending|paid|shipped|cancelled) = "pending"
 
+  // Computed field — derived from data, not stored
   total: Float = fn() =>
     this.items |> sum(item => item.price * item.quantity)
 
+  // Authorization — who can do what
   capability owner {
     scope: fn(user: User) => this.customer == user
     actions: ["read", "update", "cancel"]
   }
 
+  // Workflow — what happens when state changes
   workflow onUpdate {
     when this.status == "paid" then {
       notify(this.customer, "Payment confirmed")
@@ -92,12 +167,82 @@ entity Order {
 }
 ```
 
-Both notations can be mixed in the same file.
+Full syntax includes:
+- **Lambda expressions** — `fn(x) => x * 2`
+- **Pattern matching** — `match status with { "draft" => ..., "published" => ... }`
+- **Pipeline operator** — `items |> filter(x => x.active) |> sum(x => x.price)`
+- **Conditionals** — `if x > 0 then "positive" else "non-positive"`
+- **Effect types** — `Query<User>`, `Mutate<Order>` (tracks read vs write intent)
+
+Dense and full notation can be mixed in the same file.
+
+---
+
+## Complete Example
+
+A multi-tenant SaaS task manager in ~40 lines:
+
+```kappa
+Organization {
+  id: id*,
+  name: s*,
+  slug: s*@!(3,)
+}
+
+Project {
+  id: id*,
+  org: Organization*,
+  name: s*,
+  status: (planning|active|archived)=planning,
+
+  capability member {
+    scope: fn(user: User) => user.org == this.org
+    actions: ["read", "update"]
+  }
+
+  capability admin {
+    scope: fn(user: User) => user.role == "admin" && user.org == this.org
+    actions: ["read", "update", "delete", "archive"]
+  }
+}
+
+Task {
+  id: id*,
+  project: Project*,
+  title: s*(1,500),
+  assignee: User?,
+  priority: (low|medium|high|urgent)=medium,
+  due: d?,
+  completed: b=false,
+
+  urgency_score: Integer = fn() => match this.priority with {
+    "urgent" => 4, "high" => 3, "medium" => 2, "low" => 1
+  },
+
+  workflow onUpdate {
+    when this.completed && !this.was(completed) then {
+      notify(this.assignee, "Task completed")
+    }
+  }
+}
+```
+
+From this spec, generators produce: database schema with relations, TypeScript types, validation schemas, CRUD API endpoints with authorization middleware, React forms and tables, and test suites. ~40 lines of Kappa → thousands of lines of production code.
+
+---
 
 ## Specification
 
-- [Language Specification](spec/language.md) — types, syntax, expressions, workflows, capabilities, type system
-- [Dense Notation Reference](spec/dense-notation.md) — quick reference for the compact syntax
+- [Language Specification](spec/language.md) — complete reference: types, syntax, expressions, workflows, capabilities, type system, standard library
+- [Dense Notation Reference](spec/dense-notation.md) — quick reference card for the compact syntax
+
+---
+
+## Status
+
+Kappa is a working specification. The parser and code generators are under development. The language design is stable — the notation, type system, and full syntax are defined and documented.
+
+Contributions, feedback, and generator implementations for different target stacks are welcome.
 
 ## License
 
