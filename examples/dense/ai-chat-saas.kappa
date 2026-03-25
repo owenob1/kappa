@@ -1,0 +1,11 @@
+// AI chat SaaS platform (modelled on OpenAI/Anthropic API + ChatGPT/Claude entities)
+
+Organization { id: id*, name: s*, slug: s*@!(3,), plan: (free|pro|team|enterprise)=free, api_key_hash: s*!, rate_limit_rpm: i*(0,)=60, token_budget: i*(0,)=0, created: dt! }
+User { id: id*, org: Organization*, email: s*@~, name: s*, role: (owner|admin|member)=member, avatar: s?, last_active: dt?, created: dt! }
+Model { id: id*, name: s*@, provider: (openai|anthropic|google|mistral|local)*, context_window: i*, max_output: i*, input_cost_per_m: f*(0,), output_cost_per_m: f*(0,), supports_vision: b=false, supports_tools: b=false, status: (active|deprecated|preview)=active }
+Conversation { id: id*, user: User*, title: s?, model: Model*, system_prompt: t?, temperature: f(0,2)=1.0, status: (active|archived)=active, message_count: i*(0,)=0, total_tokens: i*(0,)=0, created: dt!, updated: dt }
+Message { id: id*, conversation: Conversation*, role: (system|user|assistant|tool)*, content: t*, tokens: i*(0,), model: Model?, latency_ms: i?, stop_reason: (end_turn|max_tokens|tool_use|stop_sequence)?, parent: Message?, created: dt! }
+ToolCall { id: id*, message: Message*, tool_name: s*, input: t*, output: t?, status: (pending|success|error)=pending, duration_ms: i?, created: dt! }
+Attachment { id: id*, message: Message*, filename: s*, mime_type: s*, size_bytes: i*, storage_key: s*!, created: dt! }
+ApiKey { id: id*, org: Organization*, name: s*, key_prefix: s*(8,8)*, key_hash: s*@!, scopes: [s], last_used: dt?, revoked_at: dt?, created: dt! }
+UsageRecord { id: id*, org: Organization*, model: Model*, input_tokens: i*(0,), output_tokens: i*(0,), cost_cents: i*(0,), endpoint: s*, created: dt! }
