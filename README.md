@@ -4,7 +4,7 @@
 
 <h1>Kappa</h1>
 
-**A specification language for describing applications in the fewest possible tokens.**
+**The first language designed for machines to write and machines to read.**
 
 <sub><i>Kappa captures data models, constraints, relationships, authorization, and workflows in a notation so compact that an entire entity fits on one line — and so precise that a parser can generate a full application from it. Write the spec once. Generate schemas, types, validators, APIs, UI, and tests from it. Nothing is repeated. Nothing drifts.</i></sub>
 
