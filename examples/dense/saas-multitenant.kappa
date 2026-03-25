@@ -1,0 +1,68 @@
+// Multi-tenant SaaS project management
+
+Organization {
+  id: id*,
+  name: s*,
+  slug: s*@!(3,),
+  plan: (free|starter|pro|enterprise)=free,
+  created: dt!
+}
+
+User {
+  id: id*,
+  org: Organization*,
+  email: s*@~,
+  name: s*,
+  role: (owner|admin|member|viewer)=member,
+  avatar: s?,
+  last_login: dt?,
+  active: b=true,
+  created: dt!
+}
+
+Project {
+  id: id*,
+  org: Organization*,
+  name: s*(1,200),
+  description: t?,
+  status: (planning|active|paused|archived)=planning,
+  color: s?,
+  due: d?,
+  created: dt!,
+  updated: dt
+}
+
+Task {
+  id: id*,
+  project: Project*,
+  title: s*(1,500),
+  description: t?,
+  assignee: User?,
+  reporter: User*,
+  priority: (low|medium|high|urgent)=medium,
+  status: (backlog|todo|in_progress|review|done|cancelled)=backlog,
+  estimated_hours: f?,
+  due: d?,
+  parent: Task?,
+  sort_order: i=0,
+  completed_at: dt?,
+  created: dt!,
+  updated: dt
+}
+
+Label {
+  id: id*,
+  org: Organization*,
+  name: s*(1,50),
+  color: s*(7,7),
+  created: dt!
+}
+
+Comment {
+  id: id*,
+  task: Task*,
+  author: User*,
+  body: t*(1,10000),
+  created: dt!,
+  updated: dt
+}

@@ -1,0 +1,95 @@
+// Order entity with computed fields, authorization, and workflows
+// Demonstrates full syntax mixed with dense notation
+
+entity Order {
+  // Dense notation for data fields
+  id: id*,
+  customer: User*,
+  items: [OrderItem],
+  status: (pending|paid|shipped|delivered|cancelled) = "pending",
+  currency: s*(3,3) = "AUD",
+  notes: t?,
+  created: dt!,
+  updated: dt
+
+  // Computed fields — derived from data, not stored
+  subtotal: Float = fn() =>
+    this.items |> sum(item => item.unit_price * item.quantity)
+
+  tax: Float = fn() =>
+    this.subtotal * 0.1
+
+  total: Float = fn() =>
+    this.subtotal + this.tax
+
+  item_count: Integer = fn() =>
+    this.items |> length
+
+  is_high_value: Boolean = fn() =>
+    this.total > 100000
+
+  status_label: String = fn() =>
+    match this.status with {
+      "pending" => "Awaiting payment",
+      "paid" => "Payment confirmed",
+      "shipped" => "In transit",
+      "delivered" => "Delivered",
+      "cancelled" => "Cancelled",
+      _ => "Unknown"
+    }
+
+  // Authorization — who can do what
+  capability owner {
+    scope: fn(user: User) => this.customer == user
+    actions: ["read", "update", "cancel"]
+  }
+
+  capability admin {
+    scope: fn(user: User) => user.role == "admin"
+    actions: ["read", "update", "delete", "refund"]
+  }
+
+  capability support {
+    scope: fn(user: User) => user.role == "support"
+    actions: ["read", "update"]
+  }
+
+  // Workflows — what happens when state changes
+  workflow onUpdate {
+    when this.status == "paid" && !this.was(status, "paid") then {
+      notify(this.customer, "Payment confirmed for order " + this.id)
+      inventory.reserve(this.items)
+    }
+
+    when this.status == "shipped" then {
+      notify(this.customer, "Your order has been shipped")
+    }
+
+    when this.status == "cancelled" then {
+      inventory.release(this.items)
+      payments.refund(this)
+    }
+  }
+
+  workflow scheduled("0 0 * * *") {
+    if this.status == "pending" && age(this.created) > 7.days then {
+      this.status = "cancelled"
+      notify(this.customer, "Order expired after 7 days")
+    }
+  }
+
+  // Constraints
+  constraint positive_items
+    check(this.items |> length > 0)
+    message: "Order must have at least one item"
+}
+
+// Supporting entity in dense notation
+OrderItem {
+  id: id*,
+  order: Order*,
+  product: Product*,
+  quantity: i*(1,),
+  unit_price: i*(0,),
+  line_number: i++
+}

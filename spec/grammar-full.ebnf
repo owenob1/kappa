@@ -1,0 +1,570 @@
+(* Kappa Full Syntax Grammar *)
+(* ISO/IEC 14977 EBNF Notation *)
+(* Expression-based computational language for complex data transformations *)
+(* Compatible with dense notation — produces same AST *)
+
+(* === DOCUMENT STRUCTURE === *)
+
+kappa_document =
+  { import_statement } ,
+  { entity_definition } ;
+
+import_statement =
+  "import" , identifier , [ "as" , identifier ] , "from" , string_literal ;
+
+entity_definition =
+  [ decorators ] ,
+  "entity" , entity_name ,
+  [ type_parameters ] ,
+  entity_body ;
+
+entity_name =
+  letter , { letter | digit } ;  (* PascalCase *)
+
+type_parameters =
+  "<" , type_parameter , { "," , type_parameter } , ">" ;
+
+type_parameter =
+  identifier , [ ":" , type_constraint ] ;
+
+type_constraint =
+  type_expression ;
+
+entity_body =
+  "{" , { entity_member } , "}" ;
+
+entity_member =
+  field_declaration |
+  relation_declaration |
+  computed_field_declaration |
+  workflow_declaration |
+  capability_declaration |
+  constraint_declaration ;
+
+(* === DECORATORS === *)
+
+decorators =
+  decorator , { decorator } ;
+
+decorator =
+  "@" , identifier , [ decorator_arguments ] ;
+
+decorator_arguments =
+  "(" , [ argument_list ] , ")" ;
+
+argument_list =
+  expression , { "," , expression } ;
+
+(* === FIELD DECLARATIONS === *)
+
+field_declaration =
+  [ field_modifiers ] ,
+  field_name , ":" , type_expression ,
+  [ "=" , expression ] ,
+  [ where_clause ] ;
+
+field_name =
+  letter , { letter | digit | "_" } ;  (* camelCase *)
+
+field_modifiers =
+  field_modifier , { field_modifier } ;
+
+field_modifier =
+  "primary" |
+  "required" |
+  "optional" |
+  "immutable" |
+  "indexed" |
+  "unique" |
+  "auto" ;
+
+(* === TYPE EXPRESSIONS === *)
+
+type_expression =
+  primitive_type |
+  reference_type |
+  array_type |
+  tuple_type |
+  union_type |
+  function_type |
+  generic_type |
+  type_variable ;
+
+primitive_type =
+  "String" |
+  "Text" |
+  "Integer" |
+  "Float" |
+  "Boolean" |
+  "Date" |
+  "DateTime" |
+  "ID" |
+  "Binary" ;
+
+reference_type =
+  entity_name , [ "<" , type_argument_list , ">" ] ;
+
+array_type =
+  "Array" , "<" , type_expression , ">" |
+  "[" , type_expression , "]" ;
+
+tuple_type =
+  "(" , type_expression , { "," , type_expression } , ")" ;
+
+union_type =
+  type_expression , "|" , type_expression ,
+  { "|" , type_expression } ;
+
+function_type =
+  "(" , [ parameter_type_list ] , ")" , "=>" , type_expression ;
+
+parameter_type_list =
+  parameter_type , { "," , parameter_type } ;
+
+parameter_type =
+  identifier , ":" , type_expression ;
+
+generic_type =
+  identifier , "<" , type_argument_list , ">" ;
+
+type_argument_list =
+  type_expression , { "," , type_expression } ;
+
+type_variable =
+  identifier ;
+
+(* === RELATIONS === *)
+
+relation_declaration =
+  [ relation_modifiers ] ,
+  relation_name , ":" , relation_type ,
+  relation_target ,
+  [ relation_options ] ;
+
+relation_name =
+  field_name ;
+
+relation_modifiers =
+  relation_modifier , { relation_modifier } ;
+
+relation_modifier =
+  "cascade" |
+  "restrict" |
+  "nullable" ;
+
+relation_type =
+  "belongsTo" |
+  "hasOne" |
+  "hasMany" |
+  "manyToMany" |
+  "selfReferential" ;
+
+relation_target =
+  entity_name ;
+
+relation_options =
+  "{" ,
+  { relation_option } ,
+  "}" ;
+
+relation_option =
+  "through" , ":" , entity_name |
+  "foreignKey" , ":" , string_literal |
+  "onDelete" , ":" , cascade_action |
+  "onUpdate" , ":" , cascade_action ;
+
+cascade_action =
+  "cascade" | "restrict" | "setNull" | "setDefault" ;
+
+(* === COMPUTED FIELDS === *)
+
+computed_field_declaration =
+  [ "cached" ] ,
+  "computed" , field_name , ":" , type_expression ,
+  "=" , expression ;
+
+(* === WORKFLOWS === *)
+
+workflow_declaration =
+  "on" , workflow_event ,
+  [ "when" , expression ] ,
+  workflow_body ;
+
+workflow_event =
+  "create" |
+  "update" |
+  "delete" |
+  "scheduled" , "(" , cron_expression , ")" |
+  custom_event ;
+
+custom_event =
+  identifier ;
+
+cron_expression =
+  string_literal ;
+
+workflow_body =
+  "{" , { statement } , "}" |
+  "=>" , expression ;
+
+(* === CAPABILITIES === *)
+
+capability_declaration =
+  "capability" , capability_name ,
+  "{" , { permission_rule } , "}" ;
+
+capability_name =
+  identifier ;
+
+permission_rule =
+  permission_action , ":" , permission_condition ;
+
+permission_action =
+  "create" | "read" | "update" | "delete" | "list" ;
+
+permission_condition =
+  "public" |
+  "authenticated" |
+  "owner" |
+  "role" , "(" , expression , ")" |
+  "custom" , "(" , expression , ")" |
+  expression ;
+
+(* === CONSTRAINTS === *)
+
+constraint_declaration =
+  "constraint" , constraint_name ,
+  "check" , "(" , expression , ")" ,
+  [ "message" , ":" , string_literal ] ;
+
+constraint_name =
+  identifier ;
+
+where_clause =
+  "where" , expression ;
+
+(* === EXPRESSIONS === *)
+
+expression =
+  lambda_expression |
+  if_expression |
+  match_expression |
+  pipeline_expression |
+  binary_expression |
+  unary_expression |
+  postfix_expression |
+  primary_expression ;
+
+(* Lambda Expressions: fn(params) => expr *)
+lambda_expression =
+  "fn" , "(" , [ parameter_list ] , ")" ,
+  [ ":" , type_expression ] ,
+  "=>" , expression ;
+
+parameter_list =
+  parameter , { "," , parameter } ;
+
+parameter =
+  identifier , [ ":" , type_expression ] ,
+  [ "=" , expression ] ;  (* default value *)
+
+(* If Expressions: if cond then expr else expr *)
+if_expression =
+  "if" , expression ,
+  "then" , expression ,
+  [ "else" , expression ] ;
+
+(* Match Expressions: pattern matching *)
+match_expression =
+  "match" , expression ,
+  "with" , "{" , { match_arm } , "}" ;
+
+match_arm =
+  pattern , [ "when" , expression ] , "=>" , expression ;
+
+pattern =
+  literal_pattern |
+  identifier_pattern |
+  constructor_pattern |
+  tuple_pattern |
+  array_pattern |
+  wildcard_pattern ;
+
+literal_pattern =
+  literal ;
+
+identifier_pattern =
+  identifier ;
+
+constructor_pattern =
+  entity_name , [ "(" , pattern_list , ")" ] ;
+
+pattern_list =
+  pattern , { "," , pattern } ;
+
+tuple_pattern =
+  "(" , pattern , { "," , pattern } , ")" ;
+
+array_pattern =
+  "[" , [ pattern_list ] , "]" ;
+
+wildcard_pattern =
+  "_" ;
+
+(* Pipeline Expressions: expr |> fn *)
+pipeline_expression =
+  expression , "|>" , expression ;
+
+(* Binary Expressions with precedence *)
+binary_expression =
+  logical_or_expression ;
+
+logical_or_expression =
+  logical_and_expression ,
+  { "||" , logical_and_expression } ;
+
+logical_and_expression =
+  equality_expression ,
+  { "&&" , equality_expression } ;
+
+equality_expression =
+  relational_expression ,
+  { ( "==" | "!=" ) , relational_expression } ;
+
+relational_expression =
+  additive_expression ,
+  { ( "<" | ">" | "<=" | ">=" ) , additive_expression } ;
+
+additive_expression =
+  multiplicative_expression ,
+  { ( "+" | "-" ) , multiplicative_expression } ;
+
+multiplicative_expression =
+  power_expression ,
+  { ( "*" | "/" | "%" ) , power_expression } ;
+
+power_expression =
+  unary_expression ,
+  [ "^" , power_expression ] ;  (* right associative *)
+
+(* Unary Expressions *)
+unary_expression =
+  [ unary_operator ] , postfix_expression ;
+
+unary_operator =
+  "!" | "-" | "+" ;
+
+(* Postfix Expressions *)
+postfix_expression =
+  primary_expression ,
+  { postfix_operator } ;
+
+postfix_operator =
+  member_access |
+  function_call |
+  array_access |
+  optional_chain ;
+
+member_access =
+  "." , identifier ;
+
+function_call =
+  "(" , [ argument_list ] , ")" ;
+
+array_access =
+  "[" , expression , "]" ;
+
+optional_chain =
+  "?." , identifier ;
+
+(* Primary Expressions *)
+primary_expression =
+  literal |
+  identifier |
+  this_expression |
+  parenthesized_expression |
+  array_literal |
+  record_literal |
+  query_expression ;
+
+this_expression =
+  "this" | "self" ;
+
+parenthesized_expression =
+  "(" , expression , ")" ;
+
+array_literal =
+  "[" , [ expression_list ] , "]" ;
+
+expression_list =
+  expression , { "," , expression } ;
+
+record_literal =
+  "{" , [ record_field_list ] , "}" ;
+
+record_field_list =
+  record_field , { "," , record_field } ;
+
+record_field =
+  identifier , ":" , expression |
+  identifier ;  (* shorthand *)
+
+query_expression =
+  "query" , entity_name ,
+  [ where_clause ] ,
+  [ order_clause ] ,
+  [ limit_clause ] ;
+
+order_clause =
+  "order" , "by" , order_term , { "," , order_term } ;
+
+order_term =
+  expression , [ "asc" | "desc" ] ;
+
+limit_clause =
+  "limit" , expression , [ "offset" , expression ] ;
+
+(* === STATEMENTS === *)
+
+statement =
+  expression_statement |
+  variable_declaration |
+  assignment_statement |
+  return_statement |
+  for_statement |
+  while_statement ;
+
+expression_statement =
+  expression ;
+
+variable_declaration =
+  ( "let" | "const" ) , identifier ,
+  [ ":" , type_expression ] ,
+  "=" , expression ;
+
+assignment_statement =
+  assignable , "=" , expression ;
+
+assignable =
+  identifier |
+  member_access |
+  array_access ;
+
+return_statement =
+  "return" , [ expression ] ;
+
+for_statement =
+  "for" , identifier , "in" , expression ,
+  "{" , { statement } , "}" ;
+
+while_statement =
+  "while" , expression ,
+  "{" , { statement } , "}" ;
+
+(* === LITERALS === *)
+
+literal =
+  string_literal |
+  number_literal |
+  boolean_literal |
+  null_literal ;
+
+string_literal =
+  '"' , { string_character } , '"' |
+  "'" , { string_character } , "'" |
+  "`" , { template_character } , "`" ;  (* template string *)
+
+template_character =
+  string_character |
+  "${" , expression , "}" ;
+
+string_character =
+  (* Any Unicode character except quote and newline *) ;
+
+number_literal =
+  integer_literal |
+  float_literal ;
+
+integer_literal =
+  [ "-" ] , digit , { digit } |
+  "0x" , hex_digit , { hex_digit } |  (* hexadecimal *)
+  "0b" , binary_digit , { binary_digit } ;  (* binary *)
+
+float_literal =
+  [ "-" ] , digit , { digit } , "." , digit , { digit } ,
+  [ exponent ] ;
+
+exponent =
+  ( "e" | "E" ) , [ "+" | "-" ] , digit , { digit } ;
+
+boolean_literal =
+  "true" | "false" ;
+
+null_literal =
+  "null" ;
+
+(* === IDENTIFIERS === *)
+
+identifier =
+  ( letter | "_" ) ,
+  { letter | digit | "_" } ;
+
+letter =
+  "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" |
+  "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" |
+  "U" | "V" | "W" | "X" | "Y" | "Z" |
+  "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" |
+  "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" |
+  "u" | "v" | "w" | "x" | "y" | "z" ;
+
+digit =
+  "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+
+hex_digit =
+  digit | "A" | "B" | "C" | "D" | "E" | "F" |
+  "a" | "b" | "c" | "d" | "e" | "f" ;
+
+binary_digit =
+  "0" | "1" ;
+
+(* === WHITESPACE & COMMENTS === *)
+
+whitespace =
+  " " | "\t" | "\n" | "\r" ;
+
+comment =
+  line_comment | block_comment ;
+
+line_comment =
+  "//" , { character_except_newline } , newline ;
+
+block_comment =
+  "/*" , { character } , "*/" ;
+
+newline =
+  "\n" | "\r\n" ;
+
+(* === OPERATOR PRECEDENCE (highest to lowest) === *)
+
+(*
+1.  Primary expressions (literals, identifiers, parentheses)
+2.  Postfix operators (., [], (), ?.)
+3.  Unary operators (!, -, +)
+4.  Power (^) — right associative
+5.  Multiplicative (*, /, %)
+6.  Additive (+, -)
+7.  Relational (<, >, <=, >=)
+8.  Equality (==, !=)
+9.  Logical AND (&&)
+10. Logical OR (||)
+11. Pipeline (|>)
+12. Lambda (=>)
+13. Assignment (=)
+*)
+
+(* === ASSOCIATIVITY === *)
+
+(*
+LEFT ASSOCIATIVE:  + - * / % < > <= >= == != && || |> . [] ()
+RIGHT ASSOCIATIVE: ^ => =
+*)

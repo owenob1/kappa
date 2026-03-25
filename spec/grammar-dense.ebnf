@@ -1,0 +1,170 @@
+(* Kappa Dense Notation Formal Grammar *)
+(* ISO/IEC 14977 EBNF Notation *)
+(* Compact, minimal syntax for rapid specification of data models *)
+
+(* === DOCUMENT STRUCTURE === *)
+
+kappa_document =
+  entity_definition ,
+  { entity_definition } ;
+
+entity_definition =
+  entity_name , entity_body ;
+
+entity_name =
+  letter , { letter | digit } ;  (* PascalCase *)
+
+entity_body =
+  "{" , [ field_list ] , "}" ;
+
+(* === FIELDS === *)
+
+field_list =
+  field_declaration ,
+  { "," , field_declaration } ;
+
+field_declaration =
+  field_name , ":" , field_type ,
+  [ field_modifiers ] ;
+
+field_name =
+  letter , { letter | digit | "_" } ;  (* camelCase *)
+
+field_type =
+  type_code |
+  array_type |
+  reference_type |
+  enum_type ;
+
+(* Type codes: compact single/double letter notation *)
+type_code =
+  "s" |      (* string *)
+  "t" |      (* text - unbounded *)
+  "i" |      (* integer *)
+  "f" |      (* float *)
+  "b" |      (* boolean *)
+  "d" |      (* date *)
+  "dt" |     (* datetime *)
+  "id" |     (* identifier - auto PK *)
+  "x" ;      (* binary/blob *)
+
+array_type =
+  "[" , ( type_code | reference_type | enum_type ) , "]" ;
+
+reference_type =
+  entity_name ;  (* Bare entity name = foreign key *)
+
+enum_type =
+  "(" , enum_value , { "|" , enum_value } , ")" ;
+
+enum_value =
+  identifier ;
+
+(* Field modifiers: flags and constraints *)
+field_modifiers =
+  field_modifier ,
+  { field_modifier } ;
+
+field_modifier =
+  "*" |                    (* primary key / required *)
+  "?" |                    (* optional / nullable *)
+  "!" |                    (* immutable *)
+  "~" |                    (* indexed *)
+  "@" |                    (* unique *)
+  "++" |                   (* auto-increment *)
+  "=" , literal |          (* default value *)
+  "(" , number , ")" |     (* min length/value *)
+  "(" , number , "," , number , ")" ;  (* min,max *)
+
+(* === RELATIONS === *)
+
+relation_declaration =
+  "<-" , entity_name |           (* belongs_to *)
+  "->" , entity_name |           (* has_many *)
+  "=" , entity_name ;            (* has_one *)
+
+(* === WORKFLOWS & COMPUTED === *)
+
+workflow_declaration =
+  "@" , workflow_event ,
+  "{" , [ workflow_body ] , "}" ;
+
+workflow_event =
+  "create" |
+  "update" |
+  "delete" |
+  "scheduled" ;
+
+workflow_body =
+  action , { "," , action } ;
+
+action =
+  identifier ;
+
+computed_field_declaration =
+  field_name , ":" , computation ;
+
+computation =
+  "sum(" , field_name , ")" |
+  "count(" , field_name , ")" |
+  "avg(" , field_name , ")" |
+  "max(" , field_name , ")" |
+  "min(" , field_name , ")" |
+  expression ;
+
+(* === CAPABILITIES & ACCESS === *)
+
+capability_declaration =
+  "#" , capability_type ,
+  [ "(" , entity_name , ")" ] ;
+
+capability_type =
+  "public" |
+  "authenticated" |
+  "role:" , identifier |
+  "owner" ;
+
+(* === TERMINALS === *)
+
+identifier =
+  letter , { letter | digit | "_" } ;
+
+literal =
+  string_literal |
+  number_literal |
+  boolean_literal |
+  "null" ;
+
+string_literal =
+  '"' , { character_except_quote } , '"' |
+  "'" , { character_except_apostrophe } , "'" ;
+
+number_literal =
+  [ "-" ] , digit , { digit } ,
+  [ "." , digit , { digit } ] ;
+
+boolean_literal =
+  "true" | "false" ;
+
+letter =
+  "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" |
+  "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" |
+  "U" | "V" | "W" | "X" | "Y" | "Z" |
+  "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" |
+  "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" |
+  "u" | "v" | "w" | "x" | "y" | "z" ;
+
+digit =
+  "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+
+(* === WHITESPACE & COMMENTS === *)
+
+whitespace =
+  " " | "\t" | "\n" | "\r" ;
+
+comment =
+  "//" , { character_except_newline } , newline |
+  "/*" , { character } , "*/" ;
+
+newline =
+  "\n" | "\r\n" ;

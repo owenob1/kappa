@@ -1,0 +1,32 @@
+// A simple blog with users, posts, and comments
+
+User {
+  id: id*,
+  email: s*@~,
+  name: s*(1,100),
+  role: (admin|editor|viewer)=viewer,
+  active: b=true,
+  created: dt!
+}
+
+Post {
+  id: id*,
+  title: s*(3,200),
+  slug: s*@!(3,),
+  content: t*,
+  author: User*,
+  status: (draft|published|archived)=draft,
+  tags: [s],
+  published_at: dt?,
+  created: dt!,
+  updated: dt
+}
+
+Comment {
+  id: id*,
+  post: Post*,
+  author: User*,
+  body: t*(10,2000),
+  parent: Comment?,
+  created: dt!
+}

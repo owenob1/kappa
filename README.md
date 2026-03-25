@@ -233,16 +233,35 @@ From this spec, generators produce: database schema with relations, TypeScript t
 
 ## Specification
 
-- [Language Specification](spec/language.md) — complete reference: types, syntax, expressions, workflows, capabilities, type system, standard library
-- [Dense Notation Reference](spec/dense-notation.md) — quick reference card for the compact syntax
+- [Language Specification](spec/language.md) — types, syntax, expressions, workflows, capabilities, type system, standard library
+- [Dense Notation Reference](spec/dense-notation.md) — quick reference for the compact syntax
+
+### Formal Grammar (EBNF)
+
+- [Dense notation grammar](spec/grammar-dense.ebnf) — ISO/IEC 14977 EBNF for the compact syntax
+- [Full syntax grammar](spec/grammar-full.ebnf) — ISO/IEC 14977 EBNF for the expression-based syntax
+
+Both notations produce the same AST.
+
+### Examples
+
+Dense notation:
+- [Blog with users and comments](examples/dense/user-blog.kappa)
+- [E-commerce catalog with orders](examples/dense/ecommerce.kappa)
+- [Multi-tenant SaaS project manager](examples/dense/saas-multitenant.kappa)
+
+Full syntax (with computed fields, authorization, and workflows):
+- [Order with business logic](examples/full/order-with-logic.kappa)
 
 ---
 
 ## Status
 
-Kappa is a working specification. The parser and code generators are under development. The language design is stable — the notation, type system, and full syntax are defined and documented.
+Kappa is a working specification. The language design is stable — the notation, type system, full syntax, and formal grammars are defined and documented. The parser and code generators are under development.
 
-Contributions, feedback, and generator implementations for different target stacks are welcome.
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on reporting issues, proposing changes, adding examples, and building generators.
 
 ## License
 
