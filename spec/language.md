@@ -1,8 +1,4 @@
-# Kappa v3 Language Specification
-
-**Version:** 3.0.0
-**Status:** Working Draft
-**Source:** v0 Research
+# Kappa Language Specification
 
 ---
 

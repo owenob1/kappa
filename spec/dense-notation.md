@@ -1,6 +1,6 @@
 # Dense Notation Reference
 
-Quick reference for Kappa v3 dense notation syntax.
+Quick reference for Kappa dense notation syntax.
 
 ---
 
