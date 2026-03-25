@@ -1,54 +1,86 @@
-<div align="center">
+<p align="center">
+  <img src="assets/logo.svg" alt="Kappa" width="200">
+</p>
 
-<img src="assets/logo.svg" alt="Kappa" width="120" height="120" />
+<h1 align="center">Kappa</h1>
 
-<h1>Kappa</h1>
+<p align="center">
+  <strong>One file. Every layer. Zero drift.</strong>
+</p>
 
-**Spec it. Parse it. Ship it.**
+<p align="center">
+  <sub><i>Define your entire application — schema, types, validation, API, UI, and tests — in a single <code>.kappa</code> file.<br>
+  Generate production code for any stack. Nothing is repeated. Nothing falls out of sync.</i></sub>
+</p>
 
-<sub><i>Kappa captures data models, constraints, relationships, authorization, and workflows in a notation so compact that an entire entity fits on one line — and so precise that a parser can generate a full application from it. Write the spec once. Generate schemas, types, validators, APIs, UI, and tests from it. Nothing is repeated. Nothing drifts.</i></sub>
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
+  <a href="spec/language.md"><img src="https://img.shields.io/badge/Spec-Stable-green.svg" alt="Spec: Stable"></a>
+  <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
+</p>
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Spec: Stable](https://img.shields.io/badge/Spec-Stable-green.svg)](spec/language.md)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-
-<a href="spec/language.md">Specification</a>
-<span>&nbsp;&nbsp;&bull;&nbsp;&nbsp;</span>
-<a href="spec/dense-notation.md">Dense Notation</a>
-<span>&nbsp;&nbsp;&bull;&nbsp;&nbsp;</span>
-<a href="examples/">Examples</a>
-<span>&nbsp;&nbsp;&bull;&nbsp;&nbsp;</span>
-<a href="CONTRIBUTING.md">Contributing</a>
+<p align="center">
+  <a href="spec/language.md">Language Spec</a> · <a href="spec/dense-notation.md">Dense Notation</a> · <a href="examples">Examples</a> · <a href="CONTRIBUTING.md">Contributing</a>
+</p>
 
 ---
 
-</div>
+## The problem
+
+You describe a `User` six times to ship one feature:
+
+```
+Prisma schema        →  model User { id Int @id @default(autoincrement()) ... }
+TypeScript interface →  interface User { id: number; email: string; ... }
+Zod validation       →  z.object({ email: z.string().email(), ... })
+API route            →  router.get('/users/:id', async (req, res) => { ... })
+React form           →  <input type="email" required pattern="..." />
+Test fixture         →  const mockUser = { id: 1, email: 'test@example.com', ... }
+```
+
+Six files. Six chances for things to drift. Six places to update when you add a field.
+
+For AI-assisted development, this is worse: an LLM spends 70–80% of its context window reading boilerplate before it can do anything useful.
+
+## The fix
 
 ```kappa
 User { id: id*, email: s*@~, name: s*(1,100), role: (admin|editor|viewer), active: b=true, created: dt! }
 ```
 
-One line. Six fields. Required (`*`), unique (`@`), indexed (`~`), constrained (`1,100`), defaulted (`=true`), immutable (`!`). A parser reads this and generates the database column, the TypeScript type, the validation rule, the form input, and the test case for every field.
+One line. Six fields. Every decision is explicit: required (`*`), unique (`@`), indexed (`~`), length-constrained (`(1,100)`), defaulted (`=true`), immutable (`!`).
+
+A parser reads this single line and generates the database column, the TypeScript type, the validation rule, the API endpoint, the form input, and the test case for every field.
+
+**Same information. Written once. Generated everywhere.**
 
 ---
 
-## Why
+## Designed for AI-native development
 
-Every application describes the same information 6+ times — schema, types, validators, API, UI, tests. Each copy is a place where things go wrong. Kappa eliminates the copies.
+Kappa was built from the ground up for LLM workflows.
 
-For AI-assisted development, the cost is compounded: an LLM spends most of its context window reading boilerplate. Kappa was designed for minimum input, maximum correctness — a constrained vocabulary where every character carries meaning and nothing is decorative.
+**Minimal token footprint.** Every character carries meaning. No decorative syntax, no boilerplate, no repetition. An LLM can express a complete entity in a single line instead of spending hundreds of tokens across multiple files.
 
-## How
+**Streaming parse.** The dense notation parses incrementally, token by token — no buffering, no lookahead. Each field emits a complete AST node on the comma delimiter. When an LLM streams Kappa output, code generation begins before the spec is fully written. The schema column for `email` is generated while the model is still producing the next field.
+
+**Constrained vocabulary.** A small, precise set of type codes and modifiers means the LLM has fewer ways to be wrong. The grammar is unambiguous — there's exactly one way to express any given constraint.
+
+---
+
+## How it works
 
 ```
-.kappa file → Parser → AST → Generators → target code
+.kappa file  →  Parser  →  AST  →  Generators  →  target code
 ```
 
-<img src="assets/pipeline.svg" alt="Kappa Pipeline" width="800" />
+<p align="center">
+  <img src="assets/pipeline.svg" alt="Kappa Pipeline" width="800">
+</p>
 
 The parser is deterministic. The generators are deterministic. Input adapters read existing schemas (OpenAPI, SQL, GraphQL) and produce Kappa. Output generators read Kappa and produce code for any stack. Same spec, different targets.
 
-**Streaming parse.** The dense notation parses incrementally, token by token — no buffering, no lookahead. Each field emits a complete AST node on the comma delimiter. When an LLM streams Kappa output, code generation begins before the spec is fully written. The schema column for `email` can be generated while the model is still producing the next field.
+---
 
 ## Dense notation
 
@@ -58,8 +90,7 @@ The compact syntax. One entity per line.
 Product { id: id*, sku: s*@~(8,20), name: s*(1,200), price: f*(0.01,), stock: i(0,)=0, status: (draft|active|discontinued), category: Category*, created: dt! }
 ```
 
-<details>
-<summary><strong>Reference</strong></summary>
+**Quick reference**
 
 | Code | Type | &nbsp; | Modifier | Meaning |
 |------|------|---|----------|---------|
@@ -72,13 +103,15 @@ Product { id: id*, sku: s*@~(8,20), name: s*(1,200), price: f*(0.01,), stock: i(
 | `dt` | DateTime | | `(min,max)` | Constraint |
 | `id` | Identifier | | `++` | Auto-increment |
 
-References: `author: User*` &nbsp; Enums: `(a|b|c)` &nbsp; Arrays: `[s]`
+References: `author: User*` &nbsp;&mdash;&nbsp; Enums: `(a|b|c)` &nbsp;&mdash;&nbsp; Arrays: `[s]`
 
-</details>
+> Full reference: [Dense Notation Spec](spec/dense-notation.md)
+
+---
 
 ## Full syntax
 
-For logic that dense notation can't express — computed fields, authorization, workflows:
+When you need computed fields, authorization, or workflows — things dense notation can't express:
 
 ```kappa
 entity Order {
@@ -107,8 +140,8 @@ Both syntaxes mix in the same file. Both produce the same AST.
 
 ## Examples
 
-| Example | Domain |
-|---------|--------|
+| Example | What it covers |
+|---------|---------------|
 | [Blog](examples/dense/user-blog.kappa) | Users, posts, comments |
 | [E-commerce](examples/dense/ecommerce.kappa) | Products, orders, line items |
 | [SaaS Project Manager](examples/dense/saas-multitenant.kappa) | Multi-tenant orgs, projects, tasks |
@@ -117,7 +150,9 @@ Both syntaxes mix in the same file. Both produce the same AST.
 | [Compiler Pipeline](examples/dense/compiler-pipeline.kappa) | Source files, AST, symbols, IR, diagnostics |
 | [Quantum Lab](examples/dense/quantum-lab.kappa) | Backends, circuits, jobs, calibration |
 | [Order with Logic](examples/full/order-with-logic.kappa) | Computed fields, authorization, workflows |
-| [Streaming Parse](examples/streaming/incremental-parse.md) | Token-by-token incremental parsing from LLM output |
+| [Streaming Parse](examples/streaming/incremental-parse.md) | Token-by-token incremental parsing |
+
+---
 
 ## Specification
 
@@ -126,9 +161,26 @@ Both syntaxes mix in the same file. Both produce the same AST.
 - [Dense Grammar (EBNF)](spec/grammar-dense.ebnf) — formal grammar
 - [Full Grammar (EBNF)](spec/grammar-full.ebnf) — formal grammar
 
-## Status
+---
 
-Working specification. Parser and generators under development.
+## Roadmap
+
+The specification is **stable**. The toolchain is under active development:
+
+- [x] Language specification
+- [x] Dense and full syntax with unified AST
+- [x] Formal EBNF grammars
+- [ ] Reference parser (TypeScript)
+- [ ] Input adapters (OpenAPI, SQL, GraphQL → Kappa)
+- [ ] Output generators (Prisma, Zod, tRPC, React)
+- [ ] CLI tooling
+- [ ] VS Code extension with syntax highlighting
+
+## Get involved
+
+The spec is the product right now. Read it, try writing `.kappa` files for your own domain, and [open an issue](https://github.com/owenob1/kappa/issues) with what you find.
+
+If you want to build a parser or generator, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
