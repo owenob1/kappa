@@ -3,3 +3,10 @@ dist/
 target/
 *.class
 .hypothesis/
+__pycache__/
+*.lock
+
+# Internal / AI tooling
+CLAUDE.md
+OVERVIEW.md
+.srcpilot/

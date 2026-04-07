@@ -158,6 +158,19 @@ Both syntaxes mix in the same file. Both produce the same AST.
 
 ---
 
+## CLI
+
+```bash
+# Parse a file and output the AST as JSON
+kappa parse schema.kappa
+
+# Validate one or more files
+kappa validate src/*.kappa
+
+# Reformat to canonical dense notation
+kappa fmt schema.kappa --write
+```
+
 ## Specification
 
 - [Language Specification](spec/language.md) — complete reference
@@ -177,10 +190,10 @@ The specification is **stable**. The toolchain is under active development:
 - [x] Parser generator — one script produces parsers for 5 languages
 - [x] Reference parsers (TypeScript, Python, Rust, Go, Java)
 - [x] Streaming parser (character-by-character, emits on comma)
-- [x] Cross-language test suite (80 AST tests + 13,500 property-based + fuzz)
+- [x] Cross-language test suite (116 AST tests + 13,500 property-based + fuzz)
+- [x] CLI tooling (`parse`, `validate`, `fmt`)
 - [ ] Input adapters (OpenAPI, SQL, GraphQL → Kappa)
 - [ ] Output generators (Drizzle, Zod, tRPC, React)
-- [ ] CLI tooling
 - [ ] VS Code extension with syntax highlighting
 
 ## Get involved

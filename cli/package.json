@@ -1,0 +1,27 @@
+{
+  "name": "kappa-lang",
+  "version": "0.1.0",
+  "description": "CLI for the Kappa specification language",
+  "type": "module",
+  "bin": {
+    "kappa": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@kappa-lang/parser": "file:../parsers/typescript-gen"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT"
+}
